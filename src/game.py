@@ -26,6 +26,7 @@ class Game :
                 for z in range(len(self.table[w])) :
                     text += str(self.table[w][z][y])
                 text += "\n"
+            text += "\n"
         return text
     
     def play(self, x, y, z, w):
