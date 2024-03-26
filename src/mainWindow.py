@@ -23,6 +23,9 @@ class MainWindows(QMainWindow):
 
     def __init__(self, game_size, bombs):
         super().__init__()
+        self.game = game
+        self.game_size = game_size
+        self.isGameOver = False
 
         self.SetMenu()
 
@@ -133,8 +136,7 @@ class MainWindows(QMainWindow):
         self.setCentralWidget(game_table)
 
     def ButtonAction(self, event, button):
-        if self.isGameOver:
-            return
+        if self.isGameOver: return
         if event.button() == Qt.LeftButton:
             self.setButtonTextAction(button)
             self.SetGameInformation()
