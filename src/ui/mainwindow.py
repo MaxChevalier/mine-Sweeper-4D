@@ -11,11 +11,14 @@ from .case import Case
 
 class MainWindows(QMainWindow):
 
-    def __init__(self, game, game_size):
+    def __init__(self, game, game_size, bombs):
         super().__init__()
         self.game = game
         self.game_size = game_size
         self.isGameOver = False
+        self.bombs = bombs
+        self.discoverd = 0
+
 
         cell_size = 30
         cell_separator = 5
@@ -81,6 +84,9 @@ class MainWindows(QMainWindow):
         if self.isGameOver: return
         if event.button() == Qt.LeftButton:
             self.setButtonTextAction(button)
+            if not self.isGameOver and self.discoverd == self.game_size ** 4 - self.bombs:
+                    self.isGameOver = True
+                    print("You win")
         elif event.button() == Qt.RightButton:
             self.SetFlag(button)
 
@@ -96,6 +102,7 @@ class MainWindows(QMainWindow):
             button.setText("💥")
             self.isGameOver = True
         elif number == 0:
+            self.discoverd += 1
             button.setText("0")
             for w in range(-1, 2, 1):
                 for z in range(-1, 2, 1):
@@ -143,6 +150,7 @@ class MainWindows(QMainWindow):
                     else "0" + hex(int((150 / 40) * (number)))[2:]
                 )
             button.setStyleSheet({"color": color, "font-weight": "bold"})
+            self.discoverd += 1
 
     def SetFlag(self, button):
         if button is not None:
