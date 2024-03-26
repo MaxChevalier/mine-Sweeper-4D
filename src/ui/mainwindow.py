@@ -15,6 +15,7 @@ class MainWindows(QMainWindow):
         super().__init__()
         self.game = game
         self.game_size = game_size
+        self.isGameOver = False
 
         cell_size = 30
         cell_separator = 5
@@ -77,6 +78,7 @@ class MainWindows(QMainWindow):
             W_zone.addLayout(Z_zone)
 
     def ButtonAction(self, event, button):
+        if self.isGameOver: return
         if event.button() == Qt.LeftButton:
             self.setButtonTextAction(button)
         elif event.button() == Qt.RightButton:
@@ -92,6 +94,7 @@ class MainWindows(QMainWindow):
         button.hoverButton("#FFFFFF")
         if number == -1:
             button.setText("💥")
+            self.isGameOver = True
         elif number == 0:
             button.setText("0")
             for w in range(-1, 2, 1):

@@ -4,7 +4,7 @@ from src.ui.mainwindow import MainWindows
 from PySide6.QtWidgets import QApplication
 
 game_size = 5
-bombs = 25
+bombs = 10
 game = Game(game_size, bombs)
 
 
