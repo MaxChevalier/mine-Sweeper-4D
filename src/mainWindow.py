@@ -4,8 +4,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QMainWindow,
     QWidget,
-    QStatusBar,
-    QMessageBox,
+    QLabel
 )
 from PySide6.QtCore import Qt
 from .case import Case
@@ -20,77 +19,50 @@ class MainWindows(QMainWindow):
         self.game_size = game_size
         self.isGameOver = False
         self.bombs = bombs
+        self.flags = 0
         self.discoverd = 0
 
+        central_widget = QWidget()
+        
+        layout = QVBoxLayout(central_widget)
+        
+        self.game_table = self.CreateInterface()
+        layout.addWidget(self.game_table)
+        
+        self.game_information = QLabel()
+        self.SetGameInformation()
+        layout.addWidget(self.game_information)
+        
+        self.setCentralWidget(central_widget)
 
-        self.SetMenu()
-
-        self.status_bar = QStatusBar()
-        self.setStatusBar(self.status_bar)
-
-        self.UpdateConfig(game_size, bombs)
-
-    def SetMenu(self):
-        game_menu = self.menuBar().addMenu("Game")
-        Restart = game_menu.addAction("Restart")
-        Restart.triggered.connect(self.RestartGame)
-
-        config_menu = self.menuBar().addMenu("Config")
-        pre_config_game = [
-            {"size": {"X": 3, "Y": 3, "Z": 3, "W": 3}, "Bombs": 5},
-            {"size": {"X": 3, "Y": 3, "Z": 3, "W": 3}, "Bombs": 25},
-            {"size": {"X": 4, "Y": 4, "Z": 4, "W": 4}, "Bombs": 10},
-            {"size": {"X": 4, "Y": 4, "Z": 4, "W": 4}, "Bombs": 40},
-            {"size": {"X": 5, "Y": 5, "Z": 5, "W": 5}, "Bombs": 15},
-            {"size": {"X": 5, "Y": 5, "Z": 5, "W": 5}, "Bombs": 75},
-        ]
-        for config_game in pre_config_game:
-            action = config_menu.addAction(
-                "%dx%dx%dx%d - %d bombs"
-                % (
-                    config_game["size"]["X"],
-                    config_game["size"]["Y"],
-                    config_game["size"]["Z"],
-                    config_game["size"]["W"],
-                    config_game["Bombs"],
-                )
-            )
-            action.triggered.connect(
-                lambda checked=False, config_game=config_game: self.UpdateConfig(
-                    config_game["size"], config_game["Bombs"]
-                )
-            )
-
-        help_menu = self.menuBar().addMenu("Help")
-        About = help_menu.addAction("About")
-        About.triggered.connect(self.About)
-
-    def CreateInterface(self):
+        
+    
+    def CreateInterface(self) -> QWidget:
         cell_size = 30
         cell_separator = 5
-
+        
         game_table = QWidget()
-
+        
         W_zone = QVBoxLayout(game_table)
         W_zone.setObjectName("W_zone")
         W_zone.setContentsMargins(0, 0, 0, 0)
 
-        for w in range(self.game_size["W"]):
+        for w in range(self.game_size):
             Z_zone = QHBoxLayout()
             Z_zone.setObjectName("Z_zone" + str(w))
             Z_zone.setContentsMargins(0, 0, 0, 0)
-            for z in range(self.game_size["Z"]):
+            for z in range(self.game_size):
                 grid = QWidget()
                 Y_zone = QVBoxLayout()
                 Y_zone.setObjectName("Y_zone" + str(w) + "." + str(z))
                 Y_zone.setContentsMargins(0, 0, 0, 0)
-                for y in range(self.game_size["Y"]):
+                for y in range(self.game_size):
                     X_zone = QHBoxLayout()
                     X_zone.setObjectName(
                         "X_zone" + str(w) + "." + str(z) + "." + str(y)
                     )
                     X_zone.setContentsMargins(0, 0, 0, 0)
-                    for x in range(self.game_size["X"]):
+                    for x in range(self.game_size):
                         button = Case()
                         button.setObjectName(
                             "button"
@@ -114,20 +86,18 @@ class MainWindows(QMainWindow):
                         X_zone.addWidget(button)
                     Y_zone.addLayout(X_zone)
                 grid.setLayout(Y_zone)
-                grid.setMaximumWidth((cell_size + cell_separator) * self.game_size["X"])
-                grid.setMaximumHeight(
-                    (cell_size + cell_separator) * self.game_size["Y"]
-                )
-                grid.setMinimumHeight(
-                    (cell_size + cell_separator) * self.game_size["Y"]
-                )
-                grid.setMinimumWidth((cell_size + cell_separator) * self.game_size["X"])
+                grid.setMaximumWidth((cell_size + cell_separator) * self.game_size)
+                grid.setMaximumHeight((cell_size + cell_separator) * self.game_size)
+                grid.setMinimumHeight((cell_size + cell_separator) * self.game_size)
+                grid.setMinimumWidth((cell_size + cell_separator) * self.game_size)
                 grid.setStyleSheet(
                     "background-color: #FFFFFF; border: 6px ridge #c2c2c2;"
                 )
                 grid.setContentsMargins(8, 8, 8, 8)
                 Z_zone.addWidget(grid)
             W_zone.addLayout(Z_zone)
+            
+        return game_table
 
         self.setCentralWidget(game_table)
 
@@ -135,9 +105,9 @@ class MainWindows(QMainWindow):
         if self.isGameOver: return
         if event.button() == Qt.LeftButton:
             self.setButtonTextAction(button)
+            self.SetGameInformation()
             if not self.isGameOver and self.discoverd == self.game_size ** 4 - self.bombs:
                     self.isGameOver = True
-                    print("You win")
         elif event.button() == Qt.RightButton:
             self.SetFlag(button)
 
@@ -214,38 +184,6 @@ class MainWindows(QMainWindow):
             self.SetGameInformation()
         else:
             print("No sender found.")
-
+            
     def SetGameInformation(self):
-        self.status_bar.showMessage(
-            "Discoverd: %d/%d       Flags: %d/%d"
-            % (
-                self.discoverd,
-                self.game_size["X"]
-                * self.game_size["Y"]
-                * self.game_size["Z"]
-                * self.game_size["W"]
-                - self.bombs,
-                self.flags,
-                self.bombs,
-            )
-        )
-
-    def RestartGame(self):
-        self.game = Game(self.game_size, self.bombs)
-        self.isGameOver = False
-        self.flags = 0
-        self.discoverd = 0
-        self.CreateInterface()
-        self.SetGameInformation()
-
-    def UpdateConfig(self, game_size, bombs):
-        self.game_size = game_size
-        self.bombs = bombs
-        self.RestartGame()
-
-    def About(self):
-        QMessageBox.information(
-            self,
-            "About",
-            "This is a Minesweeper game in 4D made with PySide6 by Maxime Chevalier",
-        )
+        self.game_information.setText("Discoverd: %d/%d       Flags: %d/%d" % (self.discoverd, self.game_size ** 4 - self.bombs, self.flags, self.bombs))
