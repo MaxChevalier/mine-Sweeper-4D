@@ -4,6 +4,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QMainWindow,
     QWidget,
+    QLabel
 )
 from PySide6.QtCore import Qt
 from .case import Case
@@ -17,35 +18,50 @@ class MainWindows(QMainWindow):
         self.game_size = game_size
         self.isGameOver = False
         self.bombs = bombs
+        self.flags = 0
         self.discoverd = 0
 
-
-        cell_size = 30
-        cell_separator = 5
-
         central_widget = QWidget()
+        
+        layout = QVBoxLayout(central_widget)
+        
+        self.game_table = self.CreateInterface()
+        layout.addWidget(self.game_table)
+        
+        self.game_information = QLabel()
+        self.SetGameInformation()
+        layout.addWidget(self.game_information)
+        
         self.setCentralWidget(central_widget)
 
-        W_zone = QVBoxLayout(central_widget)
+        
+    
+    def CreateInterface(self) -> QWidget:
+        cell_size = 30
+        cell_separator = 5
+        
+        game_table = QWidget()
+        
+        W_zone = QVBoxLayout(game_table)
         W_zone.setObjectName("W_zone")
         W_zone.setContentsMargins(0, 0, 0, 0)
 
-        for w in range(game_size):
+        for w in range(self.game_size):
             Z_zone = QHBoxLayout()
             Z_zone.setObjectName("Z_zone" + str(w))
             Z_zone.setContentsMargins(0, 0, 0, 0)
-            for z in range(game_size):
+            for z in range(self.game_size):
                 grid = QWidget()
                 Y_zone = QVBoxLayout()
                 Y_zone.setObjectName("Y_zone" + str(w) + "." + str(z))
                 Y_zone.setContentsMargins(0, 0, 0, 0)
-                for y in range(game_size):
+                for y in range(self.game_size):
                     X_zone = QHBoxLayout()
                     X_zone.setObjectName(
                         "X_zone" + str(w) + "." + str(z) + "." + str(y)
                     )
                     X_zone.setContentsMargins(0, 0, 0, 0)
-                    for x in range(game_size):
+                    for x in range(self.game_size):
                         button = Case()
                         button.setObjectName(
                             "button"
@@ -69,24 +85,26 @@ class MainWindows(QMainWindow):
                         X_zone.addWidget(button)
                     Y_zone.addLayout(X_zone)
                 grid.setLayout(Y_zone)
-                grid.setMaximumWidth((cell_size + cell_separator) * game_size)
-                grid.setMaximumHeight((cell_size + cell_separator) * game_size)
-                grid.setMinimumHeight((cell_size + cell_separator) * game_size)
-                grid.setMinimumWidth((cell_size + cell_separator) * game_size)
+                grid.setMaximumWidth((cell_size + cell_separator) * self.game_size)
+                grid.setMaximumHeight((cell_size + cell_separator) * self.game_size)
+                grid.setMinimumHeight((cell_size + cell_separator) * self.game_size)
+                grid.setMinimumWidth((cell_size + cell_separator) * self.game_size)
                 grid.setStyleSheet(
                     "background-color: #FFFFFF; border: 6px ridge #c2c2c2;"
                 )
                 grid.setContentsMargins(8, 8, 8, 8)
                 Z_zone.addWidget(grid)
             W_zone.addLayout(Z_zone)
+            
+        return game_table
 
     def ButtonAction(self, event, button):
         if self.isGameOver: return
         if event.button() == Qt.LeftButton:
             self.setButtonTextAction(button)
+            self.SetGameInformation()
             if not self.isGameOver and self.discoverd == self.game_size ** 4 - self.bombs:
                     self.isGameOver = True
-                    print("You win")
         elif event.button() == Qt.RightButton:
             self.SetFlag(button)
 
@@ -156,7 +174,13 @@ class MainWindows(QMainWindow):
         if button is not None:
             if button.text() == "":
                 button.setText("🚩")
+                self.flags += 1
             elif button.text() == "🚩":
                 button.setText("")
+                self.flags -= 1
+            self.SetGameInformation()
         else:
             print("No sender found.")
+            
+    def SetGameInformation(self):
+        self.game_information.setText("Discoverd: %d/%d       Flags: %d/%d" % (self.discoverd, self.game_size ** 4 - self.bombs, self.flags, self.bombs))
