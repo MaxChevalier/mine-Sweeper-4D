@@ -12,7 +12,7 @@ game = Game(game_size, bombs)
 
 app = QApplication(sys.argv)
 
-main_wind = MainWindows(game_size, bombs)
+main_wind = MainWindows(game, game_size, bombs)
 main_wind.show()
 
 sys.exit(app.exec())

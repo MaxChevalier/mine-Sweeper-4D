@@ -14,18 +14,14 @@ from .game import Game
 
 class MainWindows(QMainWindow):
 
-    game: Game
-    game_size: dict
-    isGameOver: bool
-    bombs: int
-    flags: int
-    discoverd: int
-
-    def __init__(self, game_size, bombs):
+    def __init__(self, game, game_size, bombs):
         super().__init__()
         self.game = game
         self.game_size = game_size
         self.isGameOver = False
+        self.bombs = bombs
+        self.discoverd = 0
+
 
         self.SetMenu()
 
@@ -139,17 +135,9 @@ class MainWindows(QMainWindow):
         if self.isGameOver: return
         if event.button() == Qt.LeftButton:
             self.setButtonTextAction(button)
-            self.SetGameInformation()
-            if (
-                not self.isGameOver
-                and self.discoverd
-                == self.game_size["X"]
-                * self.game_size["Y"]
-                * self.game_size["Z"]
-                * self.game_size["W"]
-                - self.bombs
-            ):
-                self.isGameOver = True
+            if not self.isGameOver and self.discoverd == self.game_size ** 4 - self.bombs:
+                    self.isGameOver = True
+                    print("You win")
         elif event.button() == Qt.RightButton:
             self.SetFlag(button)
 
