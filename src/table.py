@@ -10,11 +10,11 @@ class Table(QWidget):
         super().__init__()
 
         cell_size = 30
-        cell_separator = 40
+        cell_separator = 4
 
         grid_size = [
-            (cell_size) * game_data.game_size["X"] + 23,
-            (cell_size) * game_data.game_size["Y"] + 23,
+            (cell_size) * game_data.game_size["X"] + 20,
+            (cell_size) * game_data.game_size["Y"] + 20,
         ]
 
         game_table = QWidget()
@@ -33,14 +33,14 @@ class Table(QWidget):
                 Y_zone = QVBoxLayout()
                 Y_zone.setObjectName("Y_zone" + str(w) + "." + str(z))
                 Y_zone.setContentsMargins(0, 0, 0, 0)
-                Y_zone.setSpacing(2)
+                Y_zone.setSpacing(0)
                 for y in range(game_data.game_size["Y"]):
                     X_zone = QHBoxLayout()
                     X_zone.setObjectName(
                         "X_zone" + str(w) + "." + str(z) + "." + str(y)
                     )
                     X_zone.setContentsMargins(0, 0, 0, 0)
-                    X_zone.setSpacing(2)
+                    X_zone.setSpacing(0)
                     for x in range(game_data.game_size["X"]):
                         button = Case(game_data, SetGameInformation, cell_size)
                         button.setObjectName(
