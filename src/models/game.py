@@ -12,7 +12,7 @@ class Game:
             for _ in range(size["W"])
         ]
         self._generate_table(size, bombs)
-        print(self.table)
+        print(self)
 
     def _generate_table(self, size, bombs):
         bmb = 0
@@ -54,6 +54,7 @@ class Game:
             and coords[2] < size["Y"]
             and coords[3] >= 0
             and coords[3] < size["X"]
+            and self.table[coords[0]][coords[1]][coords[2]][coords[3]] != -1
         ):
             self.table[coords[0]][coords[1]][coords[2]][coords[3]] += 1
 
