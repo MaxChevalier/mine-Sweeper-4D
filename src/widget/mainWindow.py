@@ -1,8 +1,9 @@
-from PySide6.QtWidgets import QPushButton, QMainWindow, QStatusBar, QMessageBox
-from .gameData import GameData
-from src.table import Table
-from .game import Game
-
+from time import sleep
+from PySide6.QtWidgets import QWidget, QMainWindow, QStatusBar, QMessageBox, QVBoxLayout
+from .game_info import GameInfo
+from ..models.gameData import GameData
+from .table import Table
+from ..models.game import Game
 
 class MainWindows(QMainWindow):
 
@@ -12,16 +13,19 @@ class MainWindows(QMainWindow):
         super().__init__()
 
         self.SetMenu()
-
-        self.status_bar = QStatusBar()
-        self.setStatusBar(self.status_bar)
+        
+        central = QWidget()
+        self.setCentralWidget(central)
+        self.central_layout = QVBoxLayout(central)
+        self.game_info = QWidget()
+        self.table = QWidget()
 
         self.UpdateConfig(game_size, bombs)
 
     def SetMenu(self):
         game_menu = self.menuBar().addMenu("Game")
-        Restart = game_menu.addAction("Restart")
-        Restart.triggered.connect(self.RestartGame)
+        restart = game_menu.addAction("Restart")
+        restart.triggered.connect(self.RestartGame)
 
         config_menu = self.menuBar().addMenu("Config")
         pre_config_game = [
@@ -50,35 +54,26 @@ class MainWindows(QMainWindow):
             )
 
         help_menu = self.menuBar().addMenu("Help")
-        About = help_menu.addAction("About")
-        About.triggered.connect(self.About)
+        about = help_menu.addAction("About")
+        about.triggered.connect(self.About)
 
     def CreateInterface(self):
-        central = Table(self.game_data, self.SetGameInformation)
-        self.setCentralWidget(central)
-
-    def SetGameInformation(self):
-        self.status_bar.showMessage(
-            "Discoverd: %d/%d       Flags: %d/%d"
-            % (
-                self.game_data.discoverd,
-                self.game_data.game_size["X"]
-                * self.game_data.game_size["Y"]
-                * self.game_data.game_size["Z"]
-                * self.game_data.game_size["W"]
-                - self.game_data.bombs,
-                self.game_data.flags,
-                self.game_data.bombs,
-            )
-        )
+        self.game_info = GameInfo(self.game_data)
+        self.game_info.emoji_ui.clicked.connect(self.RestartGame)
+        self.table = Table(self.game_data, self.game_info)
+        for i in reversed(range(self.central_layout.count())): 
+            self.central_layout.itemAt(i).widget().setParent(None)
+        self.central_layout.addWidget(self.game_info)
+        self.central_layout.addWidget(self.table)
 
     def RestartGame(self):
+        if isinstance(self.game_info, GameInfo):
+            self.game_info.stop_timer()
         self.game_data.game = Game(self.game_data.game_size, self.game_data.bombs)
-        self.game_data.isGameOver = False
+        self.game_data.is_game_over = False
         self.game_data.flags = 0
         self.game_data.discoverd = 0
         self.CreateInterface()
-        self.SetGameInformation()
 
     def UpdateConfig(self, game_size, bombs):
         self.game_data.game_size = game_size
@@ -91,3 +86,10 @@ class MainWindows(QMainWindow):
             "About",
             "This is a Minesweeper game in 4D made with PySide6 by Maxime Chevalier",
         )
+        
+    def closeEvent(self, event):
+        if isinstance(self.game_info, GameInfo):
+            self.game_info.stop_timer() # Arrêter le thread lorsque l'application se ferme
+            sleep(1) # Attendre 1 seconde pour laisser le temps au thread de s'arrêter
+        
+    

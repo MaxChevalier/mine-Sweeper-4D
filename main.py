@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from src.mainWindow import MainWindows
+from src.widget.mainWindow import MainWindows
 from PySide6.QtWidgets import QApplication
 
 game_size = {"X": 3, "Y": 3, "Z": 3, "W": 3}

@@ -4,7 +4,7 @@ class GameData:
     
     game: Game
     game_size: dict
-    isGameOver: bool
+    is_game_over: bool
     bombs: int
     flags: int
     discoverd: int
