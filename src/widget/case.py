@@ -138,7 +138,7 @@ class Case(QPushButton):
         elif number == 0:
             self.game_data.discoverd += 1
             self.setText("0")
-
+            self.reveal_neighbors(coord)
         else:
             self.setText(str(number))
             if number > 40:
