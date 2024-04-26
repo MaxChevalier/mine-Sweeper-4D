@@ -26,7 +26,6 @@ class Game:
             # si il n'y a pas de bombe sur la case
             # la bombs ne peut pas être sur la case de départ
             if self.table[coords[0]][coords[1]][coords[2]][coords[3]] != -1  and coords != start_coords:
-                print(coords, nb_try)
                 # la bombs ne peut pas être sur la un voisin de la case de départ
                 # si sur 25 tentatives on a pas trouvé de case valide on accepte les voisins
                 if nb_try >= 25 or ( abs(coords[0] - start_coords[0]) > 1 or abs(coords[1] - start_coords[1]) > 1 or abs(coords[2] - start_coords[2]) > 1 or abs(coords[3] - start_coords[3]) > 1 ):
