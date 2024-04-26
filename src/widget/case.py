@@ -3,6 +3,7 @@ from PySide6.QtCore import Qt
 
 from .game_info import GameInfo
 from ..models.gameData import GameData
+from ..models.game import Game
 
 
 class Case(QPushButton):
@@ -89,6 +90,8 @@ class Case(QPushButton):
     def ButtonAction(self, event):
         if self.game_data.is_game_over:
             return
+        elif self.game_data.game == None:
+            self.game_data.game = Game(self.game_data.game_size, self.game_data.bombs, [int(i) for i in self.objectName()[6:].split(".")])
         if event.button() == Qt.LeftButton:
             self.setButtonTextAction()
             if (
