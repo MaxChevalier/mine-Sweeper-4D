@@ -12,7 +12,6 @@ class Game:
             for _ in range(size["W"])
         ]
         self._generate_table(size, bombs, start_coords)
-        print(self)
 
     def _generate_table(self, size, bombs, start_coords):
         bmb = 0
