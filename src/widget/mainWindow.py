@@ -3,7 +3,6 @@ from PySide6.QtWidgets import QWidget, QMainWindow, QMessageBox, QVBoxLayout
 from .game_info import GameInfo
 from ..models.gameData import GameData
 from .table import Table
-from ..models.game import Game
 
 class MainWindows(QMainWindow):
 
@@ -69,7 +68,7 @@ class MainWindows(QMainWindow):
     def RestartGame(self):
         if isinstance(self.game_info, GameInfo):
             self.game_info.stop_timer()
-        self.game_data.game = Game(self.game_data.game_size, self.game_data.bombs)
+        self.game_data.game = None
         self.game_data.is_game_over = False
         self.game_data.flags = 0
         self.game_data.discoverd = 0
