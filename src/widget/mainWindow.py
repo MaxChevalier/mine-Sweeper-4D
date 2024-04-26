@@ -1,5 +1,5 @@
 from time import sleep
-from PySide6.QtWidgets import QWidget, QMainWindow, QStatusBar, QMessageBox, QVBoxLayout
+from PySide6.QtWidgets import QWidget, QMainWindow, QMessageBox, QVBoxLayout
 from .game_info import GameInfo
 from ..models.gameData import GameData
 from .table import Table
