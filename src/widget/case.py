@@ -134,8 +134,8 @@ class Case(QPushButton):
         self.setMinimumWidth(self.cell_size)
 
         if number == -1:
-            self.setText("💣")
             self.setStyleSheet({"background-color": "red"})
+            self.reveal_bombs()
             self.game_data.is_game_over = True
             self.game_info.set_emoji_lose()
         elif number == 0:
@@ -208,3 +208,27 @@ class Case(QPushButton):
             self.setText("")
             self.game_data.flags -= 1
         self.game_info.update_bombs_remaining()
+        
+    def reveal_bombs(self):
+        for w in range(self.game_data.game_size["W"]):
+            for z in range(self.game_data.game_size["Z"]):
+                for y in range(self.game_data.game_size["Y"]):
+                    for x in range(self.game_data.game_size["X"]):
+                        button = (
+                            self.parent()
+                            .parent()
+                            .findChild(
+                                QPushButton,
+                                "button" + str(w) + "." + str(z) + "." + str(y) + "." + str(x),
+                            )
+                        )
+                        if button:
+                            button.reveal_bomb()
+    
+    def reveal_bomb(self):
+        name = self.objectName()
+        coord = [int(i) for i in name[6:].split(".")]
+        if self.game_data.game.table[coord[0]][coord[1]][coord[2]][coord[3]] == -1 and self.text() != "🚩":
+            self.setText("💣")
+        elif self.text() == "🚩" and self.game_data.game.table[coord[0]][coord[1]][coord[2]][coord[3]] != -1:
+            self.setText("❌")
