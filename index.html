@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minesweeper 4D</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 Minesweeper 4D</h1>
+            <p>Explore a four-dimensional space filled with mines and strategy!</p>
+        </header>
+
+        <div class="control-panel">
+            <div class="settings">
+                <div class="setting-group">
+                    <label for="gridSize">Grid Size (per dimension):</label>
+                    <input type="number" id="gridSize" min="2" max="5" value="3">
+                </div>
+                <div class="setting-group">
+                    <label for="bombCount">Number of Bombs:</label>
+                    <input type="number" id="bombCount" min="1" max="50" value="5">
+                </div>
+                <div class="setting-group">
+                    <label for="dimension">Visible Dimension (W):</label>
+                    <input type="number" id="dimension" min="0" max="4" value="0">
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-label">Bombs:</span>
+                    <span class="stat-value" id="bombsRemaining">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Discovered:</span>
+                    <span class="stat-value" id="discoveredCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Flags:</span>
+                    <span class="stat-value" id="flagCount">0</span>
+                </div>
+            </div>
+
+            <div class="buttons">
+                <button id="newGameBtn" class="btn btn-primary">New Game</button>
+                <button id="resetBtn" class="btn btn-secondary">Reset</button>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="game-info">
+                <p>Left click: Dig | Right click: Flag</p>
+                <p id="gameStatus" class="status"></p>
+            </div>
+
+            <div class="dimension-controls">
+                <button id="prevDim" class="btn-nav">← Previous</button>
+                <span id="currentDim">Layer 0 of 3</span>
+                <button id="nextDim" class="btn-nav">Next →</button>
+            </div>
+
+            <div id="gameBoard" class="game-board"></div>
+        </div>
+
+        <footer>
+            <p>Minesweeper 4D - A four-dimensional twist on the classic game</p>
+            <p><a href="https://github.com/MaxChevalier/mine-Sweeper-4D" target="_blank">View on GitHub</a></p>
+        </footer>
+    </div>
+
+    <script src="game.js"></script>
+    <script src="ui.js"></script>
+</body>
+</html>

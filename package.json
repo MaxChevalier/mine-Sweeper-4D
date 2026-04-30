@@ -1,0 +1,22 @@
+{
+  "name": "minesweeper-4d-web",
+  "version": "1.0.0",
+  "description": "A four-dimensional version of the classic Minesweeper game",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [
+    "minesweeper",
+    "4d",
+    "game",
+    "web"
+  ],
+  "author": "MaxChevalier",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MaxChevalier/mine-Sweeper-4D.git"
+  }
+}
