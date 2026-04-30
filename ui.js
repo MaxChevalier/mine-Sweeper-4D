@@ -6,7 +6,6 @@
 class Game4DUI {
     constructor() {
         this.game = null;
-        this.currentDimension = 0;
         this.initializeEventListeners();
         this.startNewGame();
     }
@@ -14,8 +13,6 @@ class Game4DUI {
     initializeEventListeners() {
         document.getElementById('newGameBtn').addEventListener('click', () => this.startNewGame());
         document.getElementById('resetBtn').addEventListener('click', () => this.resetGame());
-        document.getElementById('prevDim').addEventListener('click', () => this.previousDimension());
-        document.getElementById('nextDim').addEventListener('click', () => this.nextDimension());
 
         // Update stats when settings change
         document.getElementById('gridSize').addEventListener('change', () => this.startNewGame());
@@ -34,7 +31,6 @@ class Game4DUI {
         };
 
         this.game = new Game4D(size, bombCount);
-        this.currentDimension = 0;
         document.getElementById('gameStatus').textContent = '';
         document.getElementById('gameStatus').className = 'status';
         this.render();
@@ -44,48 +40,64 @@ class Game4DUI {
         this.startNewGame();
     }
 
-    previousDimension() {
-        if (this.currentDimension > 0) {
-            this.currentDimension--;
-            this.render();
-        }
-    }
-
-    nextDimension() {
-        const maxDim = this.game.size.W - 1;
-        if (this.currentDimension < maxDim) {
-            this.currentDimension++;
-            this.render();
-        }
-    }
-
     render() {
         this.renderBoard();
         this.updateStats();
-        this.updateDimensionControls();
     }
 
     renderBoard() {
         const boardContainer = document.getElementById('gameBoard');
         boardContainer.innerHTML = '';
 
-        const w = this.currentDimension;
         const size = this.game.size;
 
-        // Create cells for the 3D slice at dimension W
-        for (let z = 0; z < size.Z; z++) {
-            for (let y = 0; y < size.Y; y++) {
-                for (let x = 0; x < size.X; x++) {
-                    const coords = [w, z, y, x];
-                    const cell = this.createCellElement(coords);
-                    boardContainer.appendChild(cell);
+        // Create W layers
+        for (let w = 0; w < size.W; w++) {
+            const wLayer = document.createElement('div');
+            wLayer.className = 'w-layer';
+
+            const wLabel = document.createElement('div');
+            wLabel.className = 'w-layer-label';
+            wLabel.textContent = `W = ${w}`;
+            wLayer.appendChild(wLabel);
+
+            const zZone = document.createElement('div');
+            zZone.className = 'z-zone';
+
+            // Create Z grids within W layer
+            for (let z = 0; z < size.Z; z++) {
+                const zGrid = document.createElement('div');
+                zGrid.className = 'z-grid';
+
+                const yZone = document.createElement('div');
+                yZone.className = 'y-zone';
+
+                // Create Y rows within Z grid
+                for (let y = 0; y < size.Y; y++) {
+                    const xZone = document.createElement('div');
+                    xZone.className = 'x-zone';
+
+                    // Create X columns within Y row
+                    for (let x = 0; x < size.X; x++) {
+                        const coords = [w, z, y, x];
+                        const cell = this.createCellElement(coords);
+                        xZone.appendChild(cell);
+                    }
+
+                    yZone.appendChild(xZone);
                 }
+
+                zGrid.appendChild(yZone);
+                zZone.appendChild(zGrid);
             }
+
+            wLayer.appendChild(zZone);
+            boardContainer.appendChild(wLayer);
         }
     }
 
     createCellElement(coords) {
-        const cell = document.createElement('div');
+        const cell = document.createElement('button');
         cell.className = 'cell';
 
         const state = this.game.getCellState(coords);
@@ -127,7 +139,71 @@ class Game4DUI {
             this.handleCellClick(coords, true);
         });
 
+        // Hover effect for neighbors
+        cell.addEventListener('mouseenter', (e) => {
+            this.highlightNeighbors(coords, true);
+        });
+
+        cell.addEventListener('mouseleave', (e) => {
+            this.highlightNeighbors(coords, false);
+        });
+
         return cell;
+    }
+
+    highlightNeighbors(coords, highlight) {
+        if (this.game.gameOver || this.game.gameWon) return;
+
+        const [w, z, y, x] = coords;
+        const size = this.game.size;
+
+        // Get all cells and highlight neighbors in 4D space
+        for (let dw = -1; dw <= 1; dw++) {
+            for (let dz = -1; dz <= 1; dz++) {
+                for (let dy = -1; dy <= 1; dy++) {
+                    for (let dx = -1; dx <= 1; dx++) {
+                        const nw = w + dw;
+                        const nz = z + dz;
+                        const ny = y + dy;
+                        const nx = x + dx;
+
+                        if (nw >= 0 && nw < size.W && nz >= 0 && nz < size.Z &&
+                            ny >= 0 && ny < size.Y && nx >= 0 && nx < size.X) {
+                            const neighborKey = `${nw},${nz},${ny},${nx}`;
+                            const neighborCell = this.getCellElement(nw, nz, ny, nx);
+                            if (neighborCell && !neighborCell.classList.contains('discovered') && !neighborCell.classList.contains('flagged')) {
+                                if (highlight) {
+                                    neighborCell.style.background = '#E0E0FF';
+                                } else {
+                                    neighborCell.style.background = '';
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    getCellElement(w, z, y, x) {
+        const boardContainer = document.getElementById('gameBoard');
+        const wLayers = boardContainer.querySelectorAll('.w-layer');
+        if (w < wLayers.length) {
+            const wLayer = wLayers[w];
+            const zGrids = wLayer.querySelectorAll('.z-grid');
+            if (z < zGrids.length) {
+                const zGrid = zGrids[z];
+                const yZones = zGrid.querySelectorAll('.y-zone > .x-zone');
+                if (y < yZones.length) {
+                    const xZone = yZones[y];
+                    const cells = xZone.querySelectorAll('.cell');
+                    if (x < cells.length) {
+                        return cells[x];
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     handleCellClick(coords, isRightClick) {
@@ -167,14 +243,6 @@ class Game4DUI {
         document.getElementById('bombsRemaining').textContent = Math.max(0, stats.bombsRemaining);
         document.getElementById('discoveredCount').textContent = stats.discovered;
         document.getElementById('flagCount').textContent = stats.flagged;
-    }
-
-    updateDimensionControls() {
-        const maxDim = this.game.size.W - 1;
-        document.getElementById('prevDim').disabled = this.currentDimension === 0;
-        document.getElementById('nextDim').disabled = this.currentDimension === maxDim;
-        document.getElementById('currentDim').textContent = 
-            `Layer ${this.currentDimension} of ${maxDim}`;
     }
 }
 
