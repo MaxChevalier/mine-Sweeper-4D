@@ -56,11 +56,6 @@ class Game4DUI {
             const wLayer = document.createElement('div');
             wLayer.className = 'w-layer';
 
-            const wLabel = document.createElement('div');
-            wLabel.className = 'w-layer-label';
-            wLabel.textContent = `W = ${w}`;
-            wLayer.appendChild(wLabel);
-
             const zZone = document.createElement('div');
             zZone.className = 'z-zone';
 
